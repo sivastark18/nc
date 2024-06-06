@@ -1,0 +1,59 @@
+**SlidingClient**
+
+import java.io.*;
+import java.net.*;
+
+class SlidingClient{
+    public static void main(String args[]){
+        try{
+            Socket soc = new Socket("localhost", 1234); 
+            System.out.println("Waiting...");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(soc.getInputStream()));
+            PrintWriter out = new PrintWriter(soc.getOutputStream(), true);
+
+            for (int i = 0; i < 10; i++){
+                out.println("Packet" + i); // Send a message to the server
+                System.out.println("Packet" + i);
+                System.out.println("Response: " + in.readLine());
+            }
+
+            soc.close();
+            System.out.println("Disconnected");
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+}
+
+**SlidingServer**
+
+import java.io.*;
+import java.net.*;
+
+class SlidingServer{
+    public static void main(String args[]) {
+        try {
+            ServerSocket server = new ServerSocket(1234);
+            System.out.println("Running");
+
+            while (true) {
+                Socket client = server.accept();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+
+                String re;
+                while ((re = in.readLine()) != null) {
+                    System.out.println("received: " + re);
+                    out.println("Response to: " + re); // Send response back to the client
+                }
+
+                client.close();
+                System.out.println("Disconnected");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
